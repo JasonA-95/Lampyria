@@ -35,3 +35,10 @@ coup:['Gourmande','Aïe ! Pas sur la lanterne !'],
 victoire:['Gourmande','Victoire ! On mange quoi ?'],
 defaite:['Peureuse','On aurait dû faire demi-tour…']}
 };
+const mou=(x,y)=>({x,y,hp:24,max:24,pm:3,d:8,e:'🪰',n:'La mouche à braise'}),cha=(x,y)=>({x,y,hp:30,max:30,pm:2,d:10,e:'🍄',n:'Le champignon bavard'}),mot=(x,y)=>({x,y,hp:28,max:28,pm:3,d:9,e:'🐑',n:'Le mouton-fantôme'});
+DATA.res={braise:'🔥 Braises',champi:'🍄 Champignons',laine:'🐑 Laine'};
+DATA.rencontres=[
+{n:'Village des Lanternes',xp:30,loot:{braise:4},m:[mou(10,3),mou(11,8)]},
+{n:'Forêt des Champignons Lumineux',xp:55,loot:{champi:4,laine:2},unlock:'peureuse',m:[cha(10,3),cha(11,8),mot(9,10)]},
+{n:'Collines aux Moutons-Fantômes',xp:90,loot:{laine:5,braise:3},m:[mot(10,3),mot(11,8),mot(9,10),cha(11,5)]}];
+DATA.lampiste=[{cap:5,cout:{braise:4}},{cap:8,cout:{champi:4,laine:4}},{cap:12,cout:{braise:8,champi:6,laine:8}}];

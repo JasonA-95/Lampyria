@@ -3,8 +3,8 @@ const DIRS=[[1,0],[-1,0],[0,1],[0,-1]];
 class Combat{
 constructor(D,cfg){const c=D.classes[cfg.classe];this.N=D.taille;this.rocks=new Set(D.rochers.map(r=>r.join(',')));
 this.S=[...c.sorts,...cfg.lueurs.map(id=>D.lueurs[id].sort)];
-this.hero={x:D.heros.x,y:D.heros.y,hp:c.hp,max:c.hp,e:c.e,rage:false,mur:0};
-this.foes=D.monstres.map(m=>({...m}));this.PA=D.heros.pa;this.PM=D.heros.pm;this.pa=this.PA;this.pm=this.PM;
+this.hero={x:D.heros.x,y:D.heros.y,hp:c.hp+8*(cfg.niv-1),max:c.hp+8*(cfg.niv-1),e:c.e,rage:false,mur:0};
+this.foes=D.rencontres[cfg.renc].m.map(m=>({...m}));this.bonus=cfg.niv-1;this.PA=D.heros.pa;this.PM=D.heros.pm;this.pa=this.PA;this.pm=this.PM;
 this.turn=1;this.cd=this.S.map(()=>0);this.result=null;this.noMove=0;this.malus=0}
 ok(x,y){return x>=0&&y>=0&&x<this.N&&y<this.N&&!this.rocks.has(x+','+y)}
 at(x,y){const h=this.hero;return x==h.x&&y==h.y?h:this.foes.find(f=>f.hp>0&&f.x==x&&f.y==y)}
@@ -27,7 +27,7 @@ if(!this.ranged(i).some(t=>t[0]==x&&t[1]==y))return{ok:false,tag:'cible'};
 this.pa-=s.pa;this.cd[i]=s.cd||0;const r={ok:true,tag:s.say||'',dmg:0,hit:[]};
 if(s.dmg){const m=h.rage?2:1;h.rage=false;
 const T=s.aoe!=null?this.foes.filter(f=>f.hp>0&&this.dist(f,{x,y})<=s.aoe):[this.at(x,y)];
-for(const f of T){f.hp-=s.dmg*m;f.sleep=false;r.hit.push(f)}r.dmg=s.dmg*m}
+const dm=s.dmg+this.bonus;for(const f of T){f.hp-=dm*m;f.sleep=false;r.hit.push(f)}r.dmg=dm*m}
 if(s.drain)h.hp=Math.min(h.max,h.hp+Math.round(s.dmg*(1-h.hp/h.max))+2);
 if(s.heal)h.hp=Math.min(h.max,h.hp+s.heal);
 if(s.tp){h.x=x;h.y=y}
@@ -36,6 +36,10 @@ if(s.mur){h.mur=2;this.noMove=1;this.pm=0}
 if(s.sleep)this.at(x,y).sleep=true;
 if(s.swap){const f=this.at(x,y);[f.x,h.x]=[h.x,f.x];[f.y,h.y]=[h.y,f.y]}
 if(this.foes.every(f=>f.hp<=0))this.result='win';return r}
+path(x,y){const h=this.hero,p={},d={[h.x+','+h.y]:0},q=[[h.x,h.y]];
+while(q.length){const [a,b]=q.shift();if(a==x&&b==y)break;const k=d[a+','+b];if(k>=this.pm)continue;
+for(const [i,j] of DIRS){const nx=a+i,ny=b+j,n=nx+','+ny;if(this.free(nx,ny)&&d[n]==null){d[n]=k+1;p[n]=[a,b];q.push([nx,ny])}}}
+const r=[];let c=[x,y];while(c&&(c[0]!=h.x||c[1]!=h.y)){r.push(c);c=p[c[0]+','+c[1]]}return r}
 foeTurn(f){const h=this.hero;if(f.sleep){f.sleep=false;return -1}
 for(let i=0;i<f.pm&&this.dist(f,h)>1;i++){const d={[h.x+','+h.y]:0},q=[[h.x,h.y]];
 while(q.length){const [x,y]=q.shift();for(const [a,b] of DIRS){const nx=x+a,ny=y+b,k=nx+','+ny,u=this.at(nx,ny);
