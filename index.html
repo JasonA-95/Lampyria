@@ -18,10 +18,12 @@ canvas{max-width:100%;touch-action:manipulation;display:block}
 #bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:min(620px,100%)}
 button{font:inherit;font-size:14px;min-height:44px;padding:6px 12px;border-radius:10px;border:1px solid #4a3d63;background:var(--panel);color:var(--ink);cursor:pointer}
 button.on{background:var(--ember);color:#241608;border-color:var(--ember)}button:disabled{opacity:.4;cursor:default}
+#setup{width:min(620px,100%);display:none}h2{font-size:15px;color:var(--ember);margin:14px 0 4px;text-align:center}.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}#hud{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:center}
 button small{display:block;opacity:.75;font-size:12px}
 </style></head><body>
-<h1>Lampyria</h1><p class="sub">Les Sept Lueurs, combat d'essai</p>
-<div id="hud"></div><canvas id="c"></canvas><div id="sayEl"></div><div id="msgEl"></div><div id="bar"></div>
+<h1>Lampyria</h1><p class="sub">Les Sept Lueurs, combat d'essai (v2)</p>
+<div id="setup"></div>
+<div id="game" style="display:none;width:100%;max-width:620px"><div id="hud"></div><canvas id="c"></canvas><div id="sayEl"></div><div id="msgEl"></div><div id="bar"></div></div>
 <script src="donnees.js"></script>
 <script src="moteur.js"></script>
 <script src="affichage.js"></script>
