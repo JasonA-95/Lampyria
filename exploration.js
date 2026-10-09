@@ -22,31 +22,27 @@ EX.enter=(name,x,y)=>{const d=DATA.cartes[name];EX.map=name;sv.map=name;store();
 EX.x=x??d.start[0];EX.y=y??d.start[1];EX.groups=d.groups.map(q=>({...q}));EX.nodes=d.nodes.map(n=>({...n,until:0}));EX.pend=null;const Q=qs(),on=(p,i)=>{const s=Q[p.quest];return s&&s.s==1&&!(s.got||[]).includes(name+i)};
 (d.picks||[]).forEach((p,i)=>{if(on(p,i))EX.nodes.push({x:p.x,y:p.y,pick:1,quest:p.quest,id:name+i,until:0})});
 (d.hides||[]).forEach((p,i)=>{if(on(p,i))EX.groups.push({x:p.x,y:p.y,renc:p.renc,hide:1,quest:p.quest,id:name+i})})}
-EX.start=()=>{EX.on=true;EX.tok++;EX.walking=false;EX.group=null;$('setup').style.display='none';$('game').classList.remove('hide');size();
+EX.start=()=>{EX.on=true;EX.tok++;EX.walking=false;EX.group=null;hideMenu();closeModal();$('game').classList.remove('hide');size();
 if(EX.map!==(sv.map||'village'))EX.enter(sv.map||'village');
-$('tip').textContent='Touche une case, puis touche-la encore pour y aller. Rochers et monstres bloquent le passage.';
+$('tip').textContent='Touche une case, puis touche-la encore pour y aller.';
 msg('Tu es : '+DATA.cartes[EX.map].n+'.');EX.ui();EX.draw()};
-EX.hud=()=>{const R=DATA.res;$('hud').innerHTML='Niv <b>'+sv.niv+'</b> '+DATA.cartes[EX.map].n+' '+Object.keys(R).map(k=>R[k].split(' ')[0]+' <b>'+sv.res[k]+'</b>').join(' ');
-};
-EX.ui=()=>{EX.hud();$('bar').innerHTML='';mk('Quêtes','journal',false,EX.log,false);mk('Équipement','classe, Lueurs, lampiste',false,showSetup,false)};
-EX.log=()=>{const Q=qs(),L=Object.keys(DATA.quetes).filter(id=>Q[id]).map(id=>{const q=DATA.quetes[id],s=Q[id];
-return s.s==2?'✅ '+q.n+' (terminée)':'🔸 '+q.n+' : '+Math.min(s.n||0,q.need)+'/'+q.need+(s.n>=q.need?' (à rendre)':'')});
-$('tip').innerHTML=L.length?L.join('<br>'):'Aucune quête. Parle au Maître Lampiste, au village.'};
+EX.hud=()=>{$('hud').innerHTML='<span class="chip">'+DATA.cartes[EX.map].n+'</span><span class="chip">Niv '+sv.niv+'</span>'+Object.keys(DATA.res).map(k=>'<span class="chip">'+rn(k)+' <b>'+sv.res[k]+'</b></span>').join('')};
+EX.ui=()=>{EX.hud();$('bar').innerHTML='';const F=$('foot');F.innerHTML='';F.appendChild(btn('☰ Menu','','pri',()=>openMenu()));F.appendChild(btn('📜 Quêtes','','',()=>openMenu('quetes')))};
 EX.gain=r=>{let t='';if(r.xp){sv.xp+=r.xp;t+=' +'+r.xp+' XP';while(sv.xp>=40*sv.niv){sv.xp-=40*sv.niv;sv.niv++;t+=' Niveau '+sv.niv+' !'}}
 for(const k in (r.res||{})){sv.res[k]+=r.res[k];t+=' +'+r.res[k]+' '+DATA.res[k].split(' ')[0]}
 if(r.lueur&&!sv.deb.includes(r.lueur)){sv.deb.push(r.lueur);t+=' Nouvelle Lueur : '+DATA.lueurs[r.lueur].n+' !'}store();return t};
 EX.prog=(id,cell)=>{const s=qs()[id],q=DATA.quetes[id];if(!s||s.s!=1||(s.n||0)>=q.need)return;s.got=s.got||[];if(cell)s.got.push(cell);s.n=(s.n||0)+1;store();
-msg('Quête « '+q.n+' » : '+s.n+'/'+q.need+(s.n>=q.need?'. Retourne voir le Maître Lampiste.':'.'))};
+const t='Quête « '+q.n+' » : '+s.n+'/'+q.need+(s.n>=q.need?'. Retourne voir le Maître Lampiste.':'.');msg(t);toast(t)};
 EX.talk=p=>{const Q=qs(),B=[];let t=p.txt;
 (p.quests||[]).forEach(id=>{const q=DATA.quetes[id],s=Q[id];
-if(!s){if((q.req||0)<=sv.renc)B.push(['Accepter : '+q.n,q.desc,false,()=>{Q[id]={s:1,n:0,got:[]};store();EX.enter(EX.map,EX.x,EX.y);$('sayEl').innerHTML='<b>'+p.n+'</b> : '+q.say;EX.ui();EX.draw();EX.log()},false])}
+if(!s){if((q.req||0)<=sv.renc)B.push(['Accepter : '+q.n,q.desc,false,()=>{Q[id]={s:1,n:0,got:[]};store();EX.enter(EX.map,EX.x,EX.y);speak(p.n,q.say);EX.ui();EX.draw();toast('Quête acceptée : '+q.n)},''])}
 else if(s.s==1){const ok=s.n>=q.need,afford=!q.cost||Object.keys(q.cost).every(k=>sv.res[k]>=q.cost[k]);
-if(ok)B.push(['Terminer : '+q.n,q.cost?'coût : '+Object.keys(q.cost).map(k=>q.cost[k]+' '+DATA.res[k].split(' ')[0]).join(' '):'récompense',true,()=>{
-if(q.cost)Object.keys(q.cost).forEach(k=>sv.res[k]-=q.cost[k]);s.s=2;const g=EX.gain(q.rew);EX.enter(EX.map,EX.x,EX.y);$('sayEl').innerHTML='<b>'+p.n+'</b> : '+q.fin;msg('Quête terminée !'+g);EX.ui();EX.draw();EX.log()},!afford])
+if(ok)B.push(['Terminer : '+q.n,q.cost?'coût : '+rl(q.cost):'récompense','pri',()=>{
+if(q.cost)Object.keys(q.cost).forEach(k=>sv.res[k]-=q.cost[k]);s.s=2;const g=EX.gain(q.rew);EX.enter(EX.map,EX.x,EX.y);speak(p.n,q.fin);msg('Quête terminée !'+g);toast('Quête terminée !'+g);EX.ui();EX.draw()},!afford])
 else t+=' ('+q.n+' : '+s.n+'/'+q.need+')'}});
 (p.trade||[]).forEach(tr=>{const lab=o=>Object.keys(o).map(k=>o[k]+' '+DATA.res[k].split(' ')[0]).join(' '),ok=Object.keys(tr.give).every(k=>sv.res[k]>=tr.give[k]);
-B.push(['Échanger '+lab(tr.give),'contre '+lab(tr.get),false,()=>{Object.keys(tr.give).forEach(k=>sv.res[k]-=tr.give[k]);Object.keys(tr.get).forEach(k=>sv.res[k]+=tr.get[k]);store();EX.talk(p)},!ok])});
-$('sayEl').innerHTML='<b>'+p.n+'</b> : '+t;EX.hud();$('bar').innerHTML='';B.forEach(b=>mk(b[0],b[1],b[2],b[3],b[4]));mk('Fermer','',false,()=>{EX.ui();EX.draw()},false);msg('')};
+B.push(['Échanger '+lab(tr.give),'contre '+lab(tr.get),'',()=>{Object.keys(tr.give).forEach(k=>sv.res[k]-=tr.give[k]);Object.keys(tr.get).forEach(k=>sv.res[k]+=tr.get[k]);store();EX.talk(p)},!ok])});
+speak(p.n,t);EX.hud();$('bar').innerHTML='';B.forEach(b=>mk(b[0],b[1],b[2],b[3],b[4]));const F=$('foot');F.innerHTML='';F.appendChild(btn('Fermer','','pri',()=>{EX.ui();EX.draw()}));msg('')};
 EX.click=e=>{if(EX.walking)return;const rc=cv.getBoundingClientRect(),a=(e.clientX-rc.left-ox)/(tw/2),b=(e.clientY-rc.top-oy)/(th/2),
 x=Math.round((a+b)/2),y=Math.round((b-a)/2),N=DATA.taille,d=DATA.cartes[EX.map];
 if(x<0||y<0||x>=N||y>=N||(x==EX.x&&y==EX.y))return;
@@ -67,7 +63,7 @@ else EX.fight(ent.o)};
 EX.harvest=n=>{if(n.pick){EX.nodes=EX.nodes.filter(z=>z!==n);EX.prog(n.quest,n.id);pop(n,'Trouvé !','#ffe08a');EX.draw();return}
 if(n.until>EX.steps){msg('Déjà cueilli : ça repoussera bientôt.');return}
 const k=n.res;sv.res[k]+=2;n.until=EX.steps+30;store();pop(n,'+2 '+DATA.res[k].split(' ')[0],'#7fd18b');msg('Récolte : +2 '+DATA.res[k]);EX.ui();EX.draw()};
-EX.fight=q=>{EX.walking=false;EX.on=false;EX.pend=null;EX.group=q;cfg.renc=q.renc;$('setup').style.display='none';$('game').classList.remove('hide');init()};
+EX.fight=q=>{EX.walking=false;EX.on=false;EX.pend=null;EX.group=q;cfg.renc=q.renc;hideMenu();$('game').classList.remove('hide');init()};
 EX.back=res=>{const g0=EX.group;if(res=='win'&&g0)g0.dead=true;if(res=='lose'){sv.map='village';store();EX.map=null}
 EX.start();
 if(res=='lose')msg('Tu te réveilles au village, sans rien avoir perdu.');
