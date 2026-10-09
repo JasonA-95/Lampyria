@@ -22,10 +22,10 @@ function drawFx(){const now=performance.now();for(let i=fx.length-1;i>=0;i--){co
 const cx=(f.x-f.y)*tw/2+ox,cy=(f.x+f.y)*th/2+oy-th*(1+a*1.4);g.globalAlpha=1-a*a;g.font='bold '+Math.round(tw*.55)+'px Georgia,serif';
 g.lineWidth=4;g.strokeStyle='#120d1a';g.strokeText(f.t,cx,cy);g.fillStyle=f.c;g.fillText(f.t,cx,cy);g.globalAlpha=1}}
 function chip(p,t,sub,on,dis,fn){const b=document.createElement('button');b.innerHTML=t+(sub?'<small>'+sub+'</small>':'');b.className=on?'on':'';b.disabled=dis;b.onclick=fn;$(p).appendChild(b);return b}
-function showSetup(){$('game').classList.add('hide');const s=$('setup');s.style.display='block';
+function showSetup(){EX.on=false;EX.tok++;EX.walking=false;EX.group=null;$('game').classList.add('hide');const s=$('setup');s.style.display='block';
 const all=cfg.test?Object.keys(DATA.lueurs):sv.deb,cap=cfg.test?12:sv.cap,R=DATA.res;cfg.lueurs=cfg.lueurs.filter(k=>all.includes(k));while(sum()>cap)cfg.lueurs.pop();
 const up=DATA.lampiste.find(u=>u.cap>sv.cap);
-s.innerHTML='<section><h2>Niveau '+sv.niv+' ('+sv.xp+'/'+40*sv.niv+' XP)</h2><p class="tip">'+Object.keys(R).map(k=>R[k]+' '+sv.res[k]).join('   ')+'</p><h2>Prochain combat</h2><div class="row" id="r0"></div><h2>Classe</h2><div class="row" id="r1"></div></section><section><h2>Lanterne : Lueurs '+sum()+'/'+cap+' (4 maximum)</h2><div class="row" id="r3"></div><p id="hint">'+(hint||'Touche une classe ou une Lueur pour voir ses sorts.')+'</p><div class="row" id="r2"></div><div class="row" id="r4"></div></section>';
+s.innerHTML='<section><h2>Niveau '+sv.niv+' ('+sv.xp+'/'+40*sv.niv+' XP)</h2><p class="tip">'+Object.keys(R).map(k=>R[k]+' '+sv.res[k]).join('   ')+'</p><h2>Combat d\'entraînement</h2><div class="row" id="r0"></div><h2>Classe</h2><div class="row" id="r1"></div></section><section><h2>Lanterne : Lueurs '+sum()+'/'+cap+' (4 maximum)</h2><div class="row" id="r3"></div><p id="hint">'+(hint||'Touche une classe ou une Lueur pour voir ses sorts.')+'</p><div class="row" id="r2"></div><div class="row" id="r4"></div></section>';
 DATA.rencontres.forEach((e,i)=>{if(i<=sv.renc)chip('r0',e.n,e.xp+' XP',cfg.renc==i,false,()=>{cfg.renc=i;showSetup()})});
 for(const k in DATA.classes){const c=DATA.classes[k];chip('r1',c.e+' '+c.n,c.info,cfg.classe==k,false,()=>{cfg.classe=k;hint=c.sorts.map(descr).join(' ');showSetup()})}
 for(const k of all){const l=DATA.lueurs[k],on=cfg.lueurs.includes(k);
@@ -33,7 +33,8 @@ chip('r3',l.n,'taille '+l.t+' : '+l.sort.n,on,!on&&(sum()+l.t>cap||cfg.lueurs.le
 if(up&&!cfg.test){const ok=Object.keys(up.cout).every(k=>sv.res[k]>=up.cout[k]);
 chip('r2','Lampiste : capacité '+up.cap,'coût : '+Object.keys(up.cout).map(k=>up.cout[k]+' '+R[k]).join(', '),false,!ok,()=>{Object.keys(up.cout).forEach(k=>sv.res[k]-=up.cout[k]);sv.cap=up.cap;store();showSetup()})}
 chip('r2','Mode test','toutes les Lueurs, capacité 12',cfg.test,false,()=>{cfg.test=!cfg.test;showSetup()});
-chip('r4','Commencer le combat','',false,false,()=>{s.style.display='none';$('game').classList.remove('hide');init()})}
+chip('r4','Explorer le monde','village, forêt, collines, manoir',true,false,()=>EX.start());
+chip('r4','Combat d\'entraînement','',false,false,()=>{s.style.display='none';$('game').classList.remove('hide');init()})}
 function reward(){const e=DATA.rencontres[cfg.renc];if(cfg.test){msg('Victoire (mode test : pas de gain).');return}
 let t='Butin :',up=false;sv.xp+=e.xp;for(const k in e.loot){sv.res[k]+=e.loot[k];t+=' +'+e.loot[k]+' '+DATA.res[k]}
 while(sv.xp>=40*sv.niv){sv.xp-=40*sv.niv;sv.niv++;up=true}
@@ -45,7 +46,7 @@ W=L?Math.max(260,Math.min(innerWidth-285,(innerHeight-8)/.55)):Math.min(innerWid
 cv.width=Math.round(W*d);cv.height=Math.round(H*d);cv.style.width=W+'px';cv.style.height=H+'px';g.setTransform(d,0,0,d,0,0)}
 function init(){size();C=new Combat(DATA,{...cfg,niv:sv.niv});mode='move';busy=false;pend=null;say(DATA.rencontres[cfg.renc].say||'debut');
 msg('Touche une case éclairée pour te déplacer, ou choisis un sort puis une cible.');ui();draw()}
-cv.onclick=e=>{if(busy||C.result)return;const r=cv.getBoundingClientRect(),a=(e.clientX-r.left-ox)/(tw/2),b=(e.clientY-r.top-oy)/(th/2);
+cv.onclick=e=>{if(EX.on)return EX.click(e);if(busy||C.result)return;const r=cv.getBoundingClientRect(),a=(e.clientX-r.left-ox)/(tw/2),b=(e.clientY-r.top-oy)/(th/2);
 const x=Math.round((a+b)/2),y=Math.round((b-a)/2);if(x<0||y<0||x>=DATA.taille||y>=DATA.taille)return;act(x,y)};
 function act(x,y){const ok=mode=='move'?C.reach()[x+','+y]>0:C.ranged(mode).some(t=>t[0]==x&&t[1]==y);
 if(!ok){pend=null;msg(mode=='move'?MSG.loin:MSG.cible);draw();return}
@@ -74,10 +75,11 @@ const b=mk(s.n,s.pa+' PA'+(C.cd[i]?', recharge '+C.cd[i]:''),mode===i,()=>{if(of
 if(no){msg(C.cd[i]>0?'En recharge : encore '+C.cd[i]+' tour(s).':'Pas assez de PA pour ce sort.');return}mode=i;pend=s.r[1]==0?{x:C.hero.x,y:C.hero.y}:null;msg(pend?'Zone affichée. Touche ton personnage pour confirmer.':'Touche une case bleue pour voir la zone, puis touche-la encore pour confirmer.');ui();draw()},false);
 b.title=descr(s);if(no||off)b.classList.add('dim');
 b.onpointerdown=()=>{clearTimeout(tt);tt=setTimeout(()=>$('tip').textContent=descr(s),400)};b.onpointerup=b.onpointerleave=()=>clearTimeout(tt)});
-mk('Fin du tour','',false,endTurn,off);mk('Équipement','classe et Lueurs',false,showSetup,busy)}
+mk('Fin du tour','',false,endTurn,off);mk('Équipement','classe et Lueurs',false,showSetup,busy);
+if(C.result&&EX.group)mk('Retour au monde',C.result=='win'?'victoire':'défaite',true,()=>EX.back(C.result),false)}
 const col=l=>'rgb('+[38+82*l,32+52*l,51-3*l].map(Math.round)+')';
 function dia(cx,cy,f){g.beginPath();g.moveTo(cx,cy-th/2);g.lineTo(cx+tw/2,cy);g.lineTo(cx,cy+th/2);g.lineTo(cx-tw/2,cy);g.closePath();g.fillStyle=f;g.fill();g.strokeStyle='rgba(0,0,0,.25)';g.stroke()}
-function draw(){const N=DATA.taille,h=C.hero;g.clearRect(0,0,W,H);
+function draw(){if(EX.on)return EX.draw();const N=DATA.taille,h=C.hero;g.clearRect(0,0,W,H);
 const rc=mode=='move'&&!busy&&!C.result?C.reach():{},rs=new Set(mode!='move'&&!C.result?C.ranged(mode).map(t=>t.join(',')):[]),rz=new Set(mode!='move'&&!C.result?C.zone(mode).map(t=>t.join(',')):[]);
 const pp={},zone=new Set();if(pend&&!C.result){if(mode=='move')C.path(pend.x,pend.y).forEach(t=>pp[t.join(',')]=1);
 else{const s=C.S[mode];for(let x=0;x<N;x++)for(let y=0;y<N;y++)if(C.ok(x,y)&&C.dist({x,y},pend)<=(s.aoe??0))zone.add(x+','+y)}}
@@ -91,4 +93,4 @@ g.fillStyle='#000a';g.fillRect(cx-tw*.25,cy-th*.95,tw*.5,4);g.fillStyle=u===h?'#
 const hx=(h.x-h.y)*tw/2+ox,hy=(h.x+h.y)*th/2+oy,gr=g.createRadialGradient(hx,hy,0,hx,hy,tw*3);
 gr.addColorStop(0,'rgba(255,180,84,.28)');gr.addColorStop(1,'rgba(255,180,84,0)');
 g.globalCompositeOperation='lighter';g.fillStyle=gr;g.fillRect(0,0,W,H);g.globalCompositeOperation='source-over';drawFx()}
-addEventListener('resize',()=>{if(C&&!$('game').classList.contains('hide')){size();draw()}});showSetup();
+addEventListener('resize',()=>{if(EX.on||(C&&!$('game').classList.contains('hide'))){size();draw()}});showSetup();

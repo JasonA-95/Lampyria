@@ -45,3 +45,27 @@ DATA.rencontres=[
 DATA.lampiste=[{cap:5,cout:{braise:4}},{cap:8,cout:{champi:4,laine:4}},{cap:12,cout:{braise:8,champi:6,laine:8}}];
 const boss=(x,y)=>({x,y,hp:90,max:90,pm:2,d:12,e:'👻',n:'Le Chambellan Poussière',boss:1}),frm=(x,y)=>({x,y,hp:15,max:15,pm:0,d:0,e:'📜',n:'Le formulaire',form:1});
 DATA.rencontres.push({n:'Manoir du Chambellan (boss)',xp:150,loot:{braise:8,laine:4,champi:4},say:'formulaire',m:[boss(11,7),frm(11,6),mou(9,3),mou(10,9)]});
+DATA.resE={braise:'🔥',champi:'🍄',laine:'🧶'};
+DATA.cartes={
+village:{n:'Village des Lanternes',need:0,start:[3,6],tint:'rgba(255,170,80,.08)',
+rocks:[[5,2],[5,3],[7,9],[8,9],[2,9],[10,3],[9,2],[6,10],[11,10]],
+npcs:[{x:6,y:4,e:'🧓',n:'Maître Lampiste',txt:"Ta lanterne réagit à cette Lueur… fascinant ! Rapporte-moi des ressources et je lui ferai de la place."}],
+groups:[{x:10,y:4,renc:0},{x:10,y:8,renc:0}],
+nodes:[{x:7,y:2,res:'braise'},{x:3,y:10,res:'braise'}],
+exits:[{x:12,y:6,to:'foret',tx:1,ty:6}]},
+foret:{n:'Forêt des Champignons Lumineux',need:1,start:[1,6],tint:'rgba(60,150,90,.16)',
+rocks:[[4,3],[4,4],[7,8],[8,8],[6,2],[9,3],[3,9],[10,10]],npcs:[],
+groups:[{x:9,y:5,renc:1},{x:9,y:10,renc:1}],
+nodes:[{x:2,y:3,res:'champi'},{x:5,y:10,res:'champi'},{x:10,y:2,res:'laine'}],
+exits:[{x:0,y:6,to:'village',tx:11,ty:6},{x:12,y:6,to:'collines',tx:1,ty:6}]},
+collines:{n:'Collines aux Moutons-Fantômes',need:2,start:[1,6],tint:'rgba(130,160,210,.14)',
+rocks:[[3,3],[4,3],[6,8],[7,8],[9,5],[10,5],[2,9]],npcs:[],
+groups:[{x:8,y:3,renc:2},{x:9,y:9,renc:2}],
+nodes:[{x:2,y:2,res:'laine'},{x:5,y:10,res:'laine'},{x:11,y:10,res:'braise'}],
+exits:[{x:0,y:6,to:'foret',tx:11,ty:6},{x:12,y:6,to:'manoir',tx:1,ty:6}]},
+manoir:{n:'Manoir du Chambellan',need:3,start:[1,6],tint:'rgba(130,70,170,.2)',
+rocks:[[4,2],[4,10],[8,2],[8,10],[6,4],[6,8]],npcs:[],
+groups:[{x:10,y:6,renc:3}],
+nodes:[{x:2,y:2,res:'braise'},{x:2,y:10,res:'champi'}],
+exits:[{x:0,y:6,to:'collines',tx:11,ty:6}]}};
+
