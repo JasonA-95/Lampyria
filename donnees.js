@@ -9,7 +9,7 @@ monstres:[
 {x:9,y:10,hp:30,max:30,pm:2,d:10,e:'🍄',n:'Le champignon bavard'}],
 classes:{
 porte:{n:'Porte-Lanterne',e:'🏮',hp:70,info:'mêlée, résistant',sorts:[
-{n:'Coup de lanterne',pa:2,r:[1,1],dmg:14},{n:'Balayage',pa:4,r:[0,0],dmg:10,aoe:1}]},
+{n:'Coup de lanterne',pa:2,r:[1,1],dmg:14,push:1},{n:'Balayage',pa:4,r:[0,0],dmg:10,aoe:1}]},
 archer:{n:'Archer Farceur',e:'🏹',hp:45,info:'distance, fragile',sorts:[
 {n:'Tir précis',pa:2,r:[2,6],los:1,dmg:11},{n:'Tir double',pa:4,r:[2,5],los:1,dmg:24}]},
 mage:{n:'Mage Distrait',e:'🧙',hp:38,info:'zone, peu de vie',sorts:[
@@ -33,7 +33,8 @@ farce:['Farceuse','Hop ! Qui est où ? Même moi je ne sais plus.'],
 ombre:['Mélancolique',"Il paraît que le soleil était plus joli que ça."],
 coup:['Gourmande','Aïe ! Pas sur la lanterne !'],
 victoire:['Gourmande','Victoire ! On mange quoi ?'],
-defaite:['Peureuse','On aurait dû faire demi-tour…']}
+defaite:['Peureuse','On aurait dû faire demi-tour…'],
+formulaire:['Gourmande',"C'est quoi ce papier qui flotte ? Il faut le déchirer… ou le jeter dehors !"]}
 };
 const mou=(x,y)=>({x,y,hp:24,max:24,pm:3,d:8,e:'🪰',n:'La mouche à braise'}),cha=(x,y)=>({x,y,hp:30,max:30,pm:2,d:10,e:'🍄',n:'Le champignon bavard'}),mot=(x,y)=>({x,y,hp:28,max:28,pm:3,d:9,e:'🐑',n:'Le mouton-fantôme'});
 DATA.res={braise:'🔥 Braises',champi:'🍄 Champignons',laine:'🐑 Laine'};
@@ -42,3 +43,5 @@ DATA.rencontres=[
 {n:'Forêt des Champignons Lumineux',xp:55,loot:{champi:4,laine:2},unlock:'peureuse',m:[cha(10,3),cha(11,8),mot(9,10)]},
 {n:'Collines aux Moutons-Fantômes',xp:90,loot:{laine:5,braise:3},m:[mot(10,3),mot(11,8),mot(9,10),cha(11,5)]}];
 DATA.lampiste=[{cap:5,cout:{braise:4}},{cap:8,cout:{champi:4,laine:4}},{cap:12,cout:{braise:8,champi:6,laine:8}}];
+const boss=(x,y)=>({x,y,hp:90,max:90,pm:2,d:12,e:'👻',n:'Le Chambellan Poussière',boss:1}),frm=(x,y)=>({x,y,hp:15,max:15,pm:0,d:0,e:'📜',n:'Le formulaire',form:1});
+DATA.rencontres.push({n:'Manoir du Chambellan (boss)',xp:150,loot:{braise:8,laine:4,champi:4},say:'formulaire',m:[boss(12,6),frm(12,5),mou(9,3),mou(10,9)]});
