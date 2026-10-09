@@ -40,7 +40,7 @@ const mou=(x,y)=>({x,y,hp:24,max:24,pm:3,d:8,e:'🪰',n:'La mouche à braise'}),
 DATA.res={braise:'🔥 Braises',champi:'🍄 Champignons',laine:'🐑 Laine'};
 DATA.rencontres=[
 {n:'Village des Lanternes',xp:30,loot:{braise:4},m:[mou(10,3),mou(11,8)]},
-{n:'Forêt des Champignons Lumineux',xp:55,loot:{champi:4,laine:2},unlock:'peureuse',m:[cha(10,3),cha(11,8),mot(9,10)]},
+{n:'Forêt des Champignons Lumineux',xp:55,loot:{champi:4,laine:2},m:[cha(10,3),cha(11,8),mot(9,10)]},
 {n:'Collines aux Moutons-Fantômes',xp:90,loot:{laine:5,braise:3},m:[mot(10,3),mot(11,8),mot(9,10),cha(11,5)]}];
 DATA.lampiste=[{cap:5,cout:{braise:4}},{cap:8,cout:{champi:4,laine:4}},{cap:12,cout:{braise:8,champi:6,laine:8}}];
 const boss=(x,y)=>({x,y,hp:90,max:90,pm:2,d:12,e:'👻',n:'Le Chambellan Poussière',boss:1}),frm=(x,y)=>({x,y,hp:15,max:15,pm:0,d:0,e:'📜',n:'Le formulaire',form:1});
@@ -49,12 +49,15 @@ DATA.resE={braise:'🔥',champi:'🍄',laine:'🧶'};
 DATA.cartes={
 village:{n:'Village des Lanternes',need:0,start:[3,6],tint:'rgba(255,170,80,.08)',
 rocks:[[5,2],[5,3],[7,9],[8,9],[2,9],[10,3],[9,2],[6,10],[11,10]],
-npcs:[{x:6,y:4,e:'🧓',n:'Maître Lampiste',txt:"Ta lanterne réagit à cette Lueur… fascinant ! Rapporte-moi des ressources et je lui ferai de la place."}],
+npcs:[{x:6,y:4,e:'🧓',n:'Maître Lampiste',quests:['q1','q2','q3'],txt:"Ta lanterne réagit à cette Lueur… fascinant ! Rapporte-moi des ressources et je lui ferai de la place (bouton Équipement)."},
+{x:4,y:8,e:'🧔',n:'Le marchand',txt:"Je ne prends pas de braises en pièces, mais j'échange volontiers !",trade:[{give:{laine:2},get:{braise:1}},{give:{braise:2},get:{champi:1}},{give:{champi:2},get:{laine:1}},{give:{braise:1},get:{laine:1}}]}],
+picks:[{x:1,y:2,quest:'q1'},{x:9,y:10,quest:'q1'},{x:12,y:2,quest:'q1'}],
 groups:[{x:10,y:4,renc:0},{x:10,y:8,renc:0}],
 nodes:[{x:7,y:2,res:'braise'},{x:3,y:10,res:'braise'}],
 exits:[{x:12,y:6,to:'foret',tx:1,ty:6}]},
 foret:{n:'Forêt des Champignons Lumineux',need:1,start:[1,6],tint:'rgba(60,150,90,.16)',
 rocks:[[4,3],[4,4],[7,8],[8,8],[6,2],[9,3],[3,9],[10,10]],npcs:[],
+hides:[{x:3,y:7,renc:1,quest:'q3'},{x:8,y:3,renc:1,quest:'q3'},{x:11,y:8,renc:1,quest:'q3'}],
 groups:[{x:9,y:5,renc:1},{x:9,y:10,renc:1}],
 nodes:[{x:2,y:3,res:'champi'},{x:5,y:10,res:'champi'},{x:10,y:2,res:'laine'}],
 exits:[{x:0,y:6,to:'village',tx:11,ty:6},{x:12,y:6,to:'collines',tx:1,ty:6}]},
@@ -68,4 +71,8 @@ rocks:[[4,2],[4,10],[8,2],[8,10],[6,4],[6,8]],npcs:[],
 groups:[{x:10,y:6,renc:3}],
 nodes:[{x:2,y:2,res:'braise'},{x:2,y:10,res:'champi'}],
 exits:[{x:0,y:6,to:'collines',tx:11,ty:6}]}};
+DATA.quetes={
+q1:{n:'Lanternes perdues',desc:'Retrouve 3 lanternes égarées dans le village.',need:3,kind:'pick',say:"Trois lanternes ont roulé hors de ma boutique. Ouvre l'œil : elles brillent encore un peu.",fin:"Les voilà ! Tu es plus doué pour les retrouver que pour les livrer.",rew:{xp:40,res:{braise:3}}},
+q2:{n:'Courrier volé',desc:'Repousse 2 groupes de voleurs de courrier devant le village.',need:2,kind:'win',renc:0,say:"Des monstres dévalisent mes livraisons. Repousse-en deux groupes, tu veux bien ?",fin:"Mon courrier est sauf. Enfin, ce qu'il en reste.",rew:{xp:50,res:{braise:2}}},
+q3:{n:"La Lueur qui s'enfuit",desc:'Trouve les 3 cachettes (🌿) de la Peureuse dans la forêt, puis offre-lui une tarte (3 🍄).',need:3,kind:'hide',req:1,cost:{champi:3},say:"Une autre Lueur se cache dans la forêt. Elle a peur de tout. Cherche les buissons suspects.",fin:"Ta Gourmande a eu raison : une tarte aux champignons, et la Peureuse sort enfin. Elle te suit.",rew:{xp:80,lueur:'peureuse'}}};
 
