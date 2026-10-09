@@ -49,7 +49,7 @@ DATA.resE={braise:'🔥',champi:'🍄',laine:'🧶'};
 DATA.cartes={
 village:{n:'Village des Lanternes',need:0,start:[3,6],tint:'rgba(255,170,80,.08)',
 rocks:[[5,2],[5,3],[7,9],[8,9],[2,9],[10,3],[9,2],[6,10],[11,10]],
-npcs:[{x:6,y:4,e:'🧓',n:'Maître Lampiste',quests:['q1','q2','q3'],txt:"Ta lanterne réagit à cette Lueur… fascinant ! Rapporte-moi des ressources et je lui ferai de la place (bouton Équipement)."},
+npcs:[{x:6,y:4,e:'🧓',n:'Maître Lampiste',quests:['q1','q2','q3'],txt:"Ta lanterne réagit à cette Lueur… fascinant ! Rapporte-moi des ressources et je lui ferai de la place (menu, onglet Lanterne)."},
 {x:4,y:8,e:'🧔',n:'Le marchand',txt:"Je ne prends pas de braises en pièces, mais j'échange volontiers !",trade:[{give:{laine:2},get:{braise:1}},{give:{braise:2},get:{champi:1}},{give:{champi:2},get:{laine:1}},{give:{braise:1},get:{laine:1}}]}],
 picks:[{x:1,y:2,quest:'q1'},{x:9,y:10,quest:'q1'},{x:12,y:2,quest:'q1'}],
 groups:[{x:10,y:4,renc:0},{x:10,y:8,renc:0}],
@@ -76,3 +76,30 @@ q1:{n:'Lanternes perdues',desc:'Retrouve 3 lanternes égarées dans le village.'
 q2:{n:'Courrier volé',desc:'Repousse 2 groupes de voleurs de courrier devant le village.',need:2,kind:'win',renc:0,say:"Des monstres dévalisent mes livraisons. Repousse-en deux groupes, tu veux bien ?",fin:"Mon courrier est sauf. Enfin, ce qu'il en reste.",rew:{xp:50,res:{braise:2}}},
 q3:{n:"La Lueur qui s'enfuit",desc:'Trouve les 3 cachettes (🌿) de la Peureuse dans la forêt, puis offre-lui une tarte (3 🍄).',need:3,kind:'hide',req:1,cost:{champi:3},say:"Une autre Lueur se cache dans la forêt. Elle a peur de tout. Cherche les buissons suspects.",fin:"Ta Gourmande a eu raison : une tarte aux champignons, et la Peureuse sort enfin. Elle te suit.",rew:{xp:80,lueur:'peureuse'}}};
 
+
+// ÉQUIPEMENT : slots arme / tête / corps / bottes / 2 accessoires. st = bonus (pv, dmg, res en %, pm). cout = recette d'atelier.
+DATA.objets={
+tisonnier:{n:'Tisonnier',e:'🔥',slot:'arme',r:0,st:{dmg:1},cout:{braise:4}},
+epee_braise:{n:'Épée de braise',e:'⚔️',slot:'arme',r:1,st:{dmg:2},cout:{braise:8,laine:2}},
+sceptre:{n:'Sceptre-champignon',e:'🍄',slot:'arme',r:2,st:{dmg:3}},
+plume:{n:'Plume du Chambellan',e:'🪶',slot:'arme',r:3,st:{dmg:4}},
+chapeau:{n:'Chapeau-champi',e:'🍄',slot:'tete',r:0,st:{pv:6},cout:{champi:3}},
+capuche:{n:'Capuche luminescente',e:'🧙',slot:'tete',r:1,st:{pv:10},cout:{champi:6,laine:2}},
+casquette:{n:'Casquette du livreur',e:'🧢',slot:'tete',r:1,st:{pv:6},set:'livreur',cout:{champi:4,laine:3,braise:2}},
+gilet:{n:'Gilet de laine',e:'🧶',slot:'corps',r:0,st:{pv:8},cout:{laine:4}},
+manteau:{n:'Manteau douillet',e:'🧥',slot:'corps',r:1,st:{pv:10,res:5},cout:{laine:8,champi:2}},
+veste_liv:{n:'Veste du livreur',e:'🦺',slot:'corps',r:1,st:{pv:8,res:3},set:'livreur',cout:{laine:6,braise:3,champi:2}},
+cape:{n:'Cape du mouton-fantôme',e:'👻',slot:'corps',r:2,st:{pv:14,res:8}},
+chaussons:{n:'Chaussons de laine',e:'🧦',slot:'bottes',r:0,st:{pv:4},cout:{laine:3}},
+bottes_liv:{n:'Bottes du livreur',e:'👢',slot:'bottes',r:1,st:{pv:6},set:'livreur',cout:{laine:4,braise:3,champi:3}},
+bottes_cha:{n:'Bottes du Chambellan',e:'🥾',slot:'bottes',r:3,st:{pv:8,pm:1}},
+amulette:{n:'Amulette de champi',e:'📿',slot:'acc',r:0,st:{pv:8},cout:{champi:5}},
+echarpe:{n:'Écharpe de laine',e:'🧣',slot:'acc',r:0,st:{res:5},cout:{laine:5}},
+bague:{n:'Bague de braise',e:'💍',slot:'acc',r:1,st:{dmg:1},cout:{braise:5,champi:2}},
+clochette:{n:'Clochette du berger',e:'🔔',slot:'acc',r:2,st:{pv:8,dmg:1}},
+lanterne_cha:{n:'Lanterne du Chambellan',e:'🏮',slot:'acc',r:3,st:{pv:10,dmg:1,res:5}}};
+DATA.sets={livreur:{n:'Panoplie du livreur',bonus:{2:{pv:10},3:{dmg:1,res:5}}}};
+DATA.rencontres[0].drops=[{id:'chaussons',p:25},{id:'echarpe',p:15}];
+DATA.rencontres[1].drops=[{id:'chapeau',p:25},{id:'amulette',p:15},{id:'clochette',p:8}];
+DATA.rencontres[2].drops=[{id:'gilet',p:20},{id:'bague',p:10},{id:'sceptre',p:10},{id:'cape',p:8}];
+DATA.rencontres[3].drops=[{id:'plume',p:35},{id:'bottes_cha',p:35},{id:'lanterne_cha',p:35}];

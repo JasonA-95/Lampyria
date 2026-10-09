@@ -1,10 +1,10 @@
 // MOTEUR : les règles du combat. Aucun affichage ici (réutilisable côté serveur plus tard).
 const DIRS=[[1,0],[-1,0],[0,1],[0,-1]];
 class Combat{
-constructor(D,cfg){const c=D.classes[cfg.classe];this.N=D.taille;this.rocks=new Set(D.rochers.map(r=>r.join(',')));
+constructor(D,cfg){const c=D.classes[cfg.classe],G={pv:0,dmg:0,res:0,pm:0,...(cfg.gear||{})};this.res=G.res;this.N=D.taille;this.rocks=new Set(D.rochers.map(r=>r.join(',')));
 this.S=[...c.sorts,...cfg.lueurs.map(id=>D.lueurs[id].sort)];
-this.hero={x:D.heros.x,y:D.heros.y,hp:c.hp+8*(cfg.niv-1),max:c.hp+8*(cfg.niv-1),e:c.e,rage:false,mur:0};
-this.foes=D.rencontres[cfg.renc].m.map(m=>({...m}));this.bonus=cfg.niv-1;this.PA=D.heros.pa;this.PM=D.heros.pm;this.pa=this.PA;this.pm=this.PM;
+this.hero={x:D.heros.x,y:D.heros.y,hp:c.hp+8*(cfg.niv-1)+G.pv,max:c.hp+8*(cfg.niv-1)+G.pv,e:c.e,rage:false,mur:0};
+this.foes=D.rencontres[cfg.renc].m.map(m=>({...m}));this.bonus=cfg.niv-1+G.dmg;this.PA=D.heros.pa;this.PM=D.heros.pm+G.pm;this.pa=this.PA;this.pm=this.PM;
 this.turn=1;this.cd=this.S.map(()=>0);this.result=null;this.noMove=0;this.malus=0;this.vuln=0}
 bossInv(){return this.foes.some(g=>g.form&&g.hp>0)}
 zone(i){const s=this.S[i],r=[];for(let x=0;x<this.N;x++)for(let y=0;y<this.N;y++){const m=this.dist(this.hero,{x,y});if(m>=s.r[0]&&m<=s.r[1]&&this.ok(x,y))r.push([x,y])}return r}
@@ -57,7 +57,7 @@ let best=null,bd=d[f.x+','+f.y]??99;
 for(const [a,b] of DIRS){const nx=f.x+a,ny=f.y+b;if(this.free(nx,ny)&&d[nx+','+ny]<bd){bd=d[nx+','+ny];best=[nx,ny]}}
 if(!best)break;f.x=best[0];f.y=best[1]}
 if(f.boss)this.followForm(f);
-if(this.dist(f,h)==1){const dm=h.mur>0?Math.ceil(f.d/2):f.d;h.hp-=dm;if(h.hp<=0){h.hp=0;this.result='lose'}return dm}return 0}
+if(this.dist(f,h)==1){const dm=Math.max(1,Math.round((h.mur>0?Math.ceil(f.d/2):f.d)*(1-this.res/100)));h.hp-=dm;if(h.hp<=0){h.hp=0;this.result='lose'}return dm}return 0}
 newTurn(){const h=this.hero;this.turn++;this.pa=this.PA;this.pm=this.noMove>0?0:this.PM-this.malus;this.malus=0;
 if(this.vuln>0&&--this.vuln==0){const b=this.foes.find(f=>f.boss&&f.hp>0),fm=this.foes.find(f=>f.form);
 if(b&&fm)for(const [a,c] of DIRS)if(this.free(b.x+a,b.y+c)){fm.x=b.x+a;fm.y=b.y+c;fm.hp=fm.max;break}}
