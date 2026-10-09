@@ -44,4 +44,4 @@ DATA.rencontres=[
 {n:'Collines aux Moutons-Fantômes',xp:90,loot:{laine:5,braise:3},m:[mot(10,3),mot(11,8),mot(9,10),cha(11,5)]}];
 DATA.lampiste=[{cap:5,cout:{braise:4}},{cap:8,cout:{champi:4,laine:4}},{cap:12,cout:{braise:8,champi:6,laine:8}}];
 const boss=(x,y)=>({x,y,hp:90,max:90,pm:2,d:12,e:'👻',n:'Le Chambellan Poussière',boss:1}),frm=(x,y)=>({x,y,hp:15,max:15,pm:0,d:0,e:'📜',n:'Le formulaire',form:1});
-DATA.rencontres.push({n:'Manoir du Chambellan (boss)',xp:150,loot:{braise:8,laine:4,champi:4},say:'formulaire',m:[boss(12,6),frm(12,5),mou(9,3),mou(10,9)]});
+DATA.rencontres.push({n:'Manoir du Chambellan (boss)',xp:150,loot:{braise:8,laine:4,champi:4},say:'formulaire',m:[boss(11,7),frm(11,6),mou(9,3),mou(10,9)]});

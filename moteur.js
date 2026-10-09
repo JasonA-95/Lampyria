@@ -45,6 +45,10 @@ path(x,y){const h=this.hero,p={},d={[h.x+','+h.y]:0},q=[[h.x,h.y]];
 while(q.length){const [a,b]=q.shift();if(a==x&&b==y)break;const k=d[a+','+b];if(k>=this.pm)continue;
 for(const [i,j] of DIRS){const nx=a+i,ny=b+j,n=nx+','+ny;if(this.free(nx,ny)&&d[n]==null){d[n]=k+1;p[n]=[a,b];q.push([nx,ny])}}}
 const r=[];let c=[x,y];while(c&&(c[0]!=h.x||c[1]!=h.y)){r.push(c);c=p[c[0]+','+c[1]]}return r}
+followForm(b){const fm=this.foes.find(g=>g.form&&g.hp>0);if(!fm)return;const h=this.hero,db=this.dist(b,h);
+const c=DIRS.map(([a,d])=>({x:b.x+a,y:b.y+d})).filter(p=>(p.x==fm.x&&p.y==fm.y)||this.free(p.x,p.y));
+if(!c.length||c.some(p=>p.x==fm.x&&p.y==fm.y&&this.dist(p,b)==1))return;
+c.sort((p,q)=>Math.abs(this.dist(p,h)-db)-Math.abs(this.dist(q,h)-db));fm.x=c[0].x;fm.y=c[0].y}
 foeTurn(f){const h=this.hero;if(f.form||f.hp<=0)return 0;if(f.sleep){f.sleep=false;return -1}
 for(let i=0;i<f.pm&&this.dist(f,h)>1;i++){const d={[h.x+','+h.y]:0},q=[[h.x,h.y]];
 while(q.length){const [x,y]=q.shift();for(const [a,b] of DIRS){const nx=x+a,ny=y+b,k=nx+','+ny,u=this.at(nx,ny);
@@ -52,6 +56,7 @@ if(d[k]==null&&this.ok(nx,ny)&&(!u||u===f)){d[k]=d[x+','+y]+1;q.push([nx,ny])}}}
 let best=null,bd=d[f.x+','+f.y]??99;
 for(const [a,b] of DIRS){const nx=f.x+a,ny=f.y+b;if(this.free(nx,ny)&&d[nx+','+ny]<bd){bd=d[nx+','+ny];best=[nx,ny]}}
 if(!best)break;f.x=best[0];f.y=best[1]}
+if(f.boss)this.followForm(f);
 if(this.dist(f,h)==1){const dm=h.mur>0?Math.ceil(f.d/2):f.d;h.hp-=dm;if(h.hp<=0){h.hp=0;this.result='lose'}return dm}return 0}
 newTurn(){const h=this.hero;this.turn++;this.pa=this.PA;this.pm=this.noMove>0?0:this.PM-this.malus;this.malus=0;
 if(this.vuln>0&&--this.vuln==0){const b=this.foes.find(f=>f.boss&&f.hp>0),fm=this.foes.find(f=>f.form);
